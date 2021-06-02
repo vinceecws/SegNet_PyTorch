@@ -26,5 +26,10 @@ The encoder of SegNet is identical to the VGGNet architecture. Each stage of the
 Each stage of the decoder is structured identically to its encoder counterpart, except that upsampling is done *prior to* convolution and batch-normalization, with the addition of using the stored max-pooling indices from the encoder for upsampling. Another exception is that the output of the second convolution layer in the final stage is not fed through the softmax activation function for classification, instead of the ReLu.
 
 ### Training
-The model is trained with pixel-wise cross entropy loss, optimized with SGD. The dataset used for training is the same as what is proposed in the original paper -- the CamVid dataset, which can be downloaded here: http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/
+The model is trained with pixel-wise cross entropy loss, optimized with SGD. The dataset used for training is the same as what is proposed in the original paper — the CamVid dataset, which can be downloaded here: http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/
 
+## Setup
+After downloading the CamVid dataset, rename the folder containing the raw images to `CamVid_Raw` and the folder containing the labelled images to `CamVid_Labeled`. Since only a portion of the raw frames are labelled (~700 images), the dataloader first selects the labelled image, then selects the corresponding raw image to form the (input, target) pair. 
+<br/>
+
+Once the folders are organized as required, run `python Train_SegNet.py` to execute training.
