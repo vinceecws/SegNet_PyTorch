@@ -68,7 +68,7 @@ def main(args):
         res = torch.argmax(res, dim=1) # one-hot squashed to pixel-wise labels
 
         for n in range(res.shape[0]): # loop over each image
-            res_image = color_map[res[n]].permute(2, 0, 1) # transpose back to C, H, W
+            res_image = color_map[res[n]].permute(2, 0, 1).to(torch.float).div(255.0) # transpose back to C, H, W, normalize to (0.0, 1.0)
             save_image(res_image, os.path.join(res_dir, "img_{}_{}.png".format(i, n)))
         
     print("Evaluation complete. {} segmented images saved at {}".format((i + 1) * (n + 1), res_dir))
