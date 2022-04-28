@@ -45,7 +45,7 @@ def main(args):
     res_dir = args.res_dir
 
     # initialize model in evaluation mode
-    model = SegNet().to(device)
+    model = SegNet.SegNet().to(device)
     model.eval()
 
     # load pretrained weights
