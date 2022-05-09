@@ -26,7 +26,7 @@ class CamVid(Dataset):
 		self.raw_dir = raw_dir
 		self.lbl_dir = lbl_dir
 		self.transform = transform
-		self.list_img = os.listdir(self.raw_dir)
+		self.list_img = [f for f in os.listdir(self.raw_dir) if not f.startswith('.')]
 
 	def one_Hot(self, image):
    		

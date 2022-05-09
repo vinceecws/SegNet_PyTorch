@@ -1,0 +1,12 @@
+{
+	"batch_size": 4,
+	"epochs": 1,
+	"learning_rate": 0.01,
+	"sgd_momentum": 0.5,
+	"bn_momentum": 0.5,
+	"cross_entropy_loss_weights": [1.0, 50.0],
+	"no_cuda": false,
+	"seed": 42,
+	"in_chn": 3,
+	"out_chn": 2
+}

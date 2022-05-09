@@ -1,0 +1,2 @@
+0 0 0	Pavement Surface
+255 255 255	Crack

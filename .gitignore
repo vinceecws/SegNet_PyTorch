@@ -1,0 +1,4 @@
+__pycache__/
+logs/
+weights/
+.DS_Store
