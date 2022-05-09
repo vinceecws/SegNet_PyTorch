@@ -1,5 +1,6 @@
 from torch.utils.data import Dataset
 from skimage import io
+from torchmetrics.functional import jaccard_index, precision, recall
 import torch
 import os
 import time
@@ -68,4 +69,21 @@ class Pavements(Dataset):
 
         return data
 
+    def compute_precision(self, pred, target, threshold=0.5):
+        # Precision: TP / (TP + FP)
+
+        return precision(pred, target, average='none', mdmc_average='samplewise', ignore_index=None, 
+            num_classes=2, threshold=0.5, top_k=None, multiclass=None)
+
+    def compute_recall(self, pred, target, threshold=0.5):
+        # Recall: TP / (TP + FN)
+
+        return recall(pred, target, average='none', mdmc_average='samplewise', ignore_index=None, 
+            num_classes=2, threshold=0.5, top_k=None, multiclass=None)
+
+    def compute_m_iou(self, pred, target, threshold=0.5):
+        # Mean Intersection over Union (mIoU) a.k.a. Jaccard Index
+
+        return jaccard_index(pred, target, 2, ignore_index=None, absent_score=0.0, 
+            threshold=threshold, reduction='none')
 

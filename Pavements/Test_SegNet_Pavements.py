@@ -75,19 +75,42 @@ def main(args):
     # build color map
     color_map = build_color_map()
 
+    # init metrics aggregation
+    num_images = 0
+    sum_precision = torch.zeros(2)
+    sum_recall = torch.zeros(2)
+    sum_m_iou = torch.zeros(2)
+
     # run evaluation
     for i, data in enumerate(dataloader):
         images = data[0].to(device)
         res = model(images)
-        res = torch.argmax(res, dim=1) # one-hot squashed to pixel-wise labels
+        res = torch.argmax(res, dim=1).type(torch.long) # pixel-wise probs squashed to pixel-wise labels
+        lbl = data[1].to(device).type(torch.long)
 
         for n in range(res.shape[0]): # loop over each image
+            image_name = "img_{}_{}.png".format(i, n)
             input_image = images[n]
             res_image = color_map[res[n]].permute(2, 0, 1).to(torch.float).div(255.0) # transpose back to C, H, W, normalize to (0.0, 1.0)
             compare_image = torch.cat((input_image, res_image), dim=2)
-            save_image(compare_image, os.path.join(args.res_dir, "img_{}_{}.png".format(i, n)))
+            save_image(compare_image, os.path.join(args.res_dir, image_name))
+
+            # Compute metrics per image & accumulate
+            precision = dataset.compute_precision(res[n], lbl[n])
+            recall = dataset.compute_recall(res[n], lbl[n])
+            m_iou = dataset.compute_m_iou(res[n], lbl[n])
+            print("{} | Precision: {} | Recall: {} | mIoU: {}".format(image_name, precision, recall, m_iou))
+
+            num_images += 1
+            sum_precision += precision
+            sum_recall += recall
+            sum_m_iou += m_iou
         
-    print("Evaluation complete. {} segmented images saved at {}".format((i + 1) * (n + 1), args.res_dir))
+    print("\nEvaluation complete. {} segmented images saved at {}\n".format(num_images, args.res_dir))
+
+    # Compute global metrics & present
+    print("Averaged metrics | Precision: {} | Recall: {} | mIoU: {}".format(
+        sum_precision / num_images, sum_recall / num_images, sum_m_iou / num_images))
 
 
 if __name__ == "__main__":
