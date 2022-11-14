@@ -3,6 +3,31 @@ PyTorch implementation of SegNet: A Deep Convolutional Encoder-Decoder Architect
 
 Original paper: https://arxiv.org/pdf/1511.00561.pdf
 
+### A summary of the original paper is provided in the next section
+
+## Pavements Dataset
+
+This model was employed to examine the feasibility of machine learning-powered monitoring of road infrastructure health. This effort contributes to "Use Of Remote Sensing And Machine Learning Techniques For Resilient Infrastructure Health Monitoring" by Narges Tahaei. The background of the study centers around determining the performance SegNet in identifying pavement cracks given the top view of expressway roads. SegNet is used here to solve a binary pixel-wise image segmentation task, where positive samples (i.e. pixels that are assigned class of 1) represent cracks on the road, and negative samples (i.e. pixels that are assigned class of 0) represent normal road surface. 
+
+The Pavements dataset consists of 1900 raw RGB images taken of interstate expressways in the state of Georgia, USA with a camera mounted on a driving vehicle. The images are cropped to a dimension of 448 x 448, with which corresponding annotated images are produced by setting pixels belonging to pavement cracks to RGB value of 255, 255, 255 (i.e. white), and other pixels to RGB value of 0, 0, 0 (i.e. black).
+
+## Training 
+An 80-20 random split was used to form the training and testing dataset. The model was trained on mini-batch gradient descent with batch size of 4 for 50 epochs. The criterion used is weighted cross-entropy loss, where weights are calculated using the median frequency pixel-wise class balancing method (Predicting Depth, Surface Normals and Semantic Labels with a Common Multi-Scale Convolutional Architecture https://arxiv.org/pdf/1411.4734.pdf).
+
+
+<p align='center'>
+  <img width="600" alt="segnet architecture" src="https://user-images.githubusercontent.com/19466657/201792550-a491412b-6b14-454f-a6b9-6aa86113fc5b.png">
+  <br/>
+  <img width="600" alt="segnet architecture" src="https://user-images.githubusercontent.com/19466657/201792737-ccb71ca6-7f61-4a1c-8cd7-4ee405786ac7.png">
+  <br/>
+  <img width="600" alt="segnet architecture" src="https://user-images.githubusercontent.com/19466657/201792748-9575858f-1baa-44e5-91a9-d74889ed9c75.png">
+  <br/>
+  Collages of model input (left), annotated ground-truth (middle), model output (right).
+</p>
+
+___
+
+
 ## A Summary
 
 The authors of this paper presents a novel approach in producing pixel-wise categorical segmentations using the very common encoder-decoder architecture. The concept of the encoder-decoder architecture (a.k.a. autoencoder) is such that the encoder block breaks down the input data by sequentially and repeatedly converting it into a higher-dimensional representation from the previous layer while trading-off size. At the end of the encoder, the highest-dimensional representation is then fed into the decoder, which performs the same process, except in reverse. The high-dimensional, small-sized output of the encoder is sequentially and repeatedly reduced to lower-dimensions and upscaled to the original input size, with a desired semantic form of output. 
