@@ -161,7 +161,3 @@ class SegNet(nn.Module):
         x = F.softmax(x, dim=1)
 
         return x
-
-
-
-

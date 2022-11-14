@@ -1,6 +1,6 @@
 from torch.utils.data import Dataset
 from skimage import io
-from torchmetrics.functional import jaccard_index, precision, recall
+from torchmetrics.functional import jaccard_index, precision, recall, stat_scores
 import torch
 import os
 import time
@@ -68,6 +68,14 @@ class Pavements(Dataset):
         data = (to_tensor(image_raw), label)
 
         return data
+    
+    def compute_pavement_crack_area(self, pred, as_ratio=False):
+      crack_pixels = torch.where(pred == 1.0)[0].shape[0]
+      if as_ratio:
+        total_pixels = pred.nelement()
+        return crack_pixels / total_pixels
+      
+      return crack_pixels
 
     def compute_precision(self, pred, target, threshold=0.5):
         # Precision: TP / (TP + FP)
@@ -85,5 +93,21 @@ class Pavements(Dataset):
         # Mean Intersection over Union (mIoU) a.k.a. Jaccard Index
 
         return jaccard_index(pred, target, 2, ignore_index=None, absent_score=0.0, 
-            threshold=threshold, reduction='none')
+            threshold=threshold, average='none')
 
+    def compute_balanced_class_accuracy(self, pred, target):
+        """
+          Balanced class accuracy = (Sensitivity + Specificity) / 2
+                                  = ((TP / (TP + FN)) + TN / (TN + FP)) / 2
+        """
+        scores = stat_scores(pred, target, reduce='macro', num_classes=2,
+            mdmc_reduce='samplewise') # [[[tp, fp, tn, fn, sup]]]
+
+        tp = scores[:, :, 0]
+        fp = scores[:, :, 1]
+        tn = scores[:, :, 2]
+        fn = scores[:, :, 3]
+        sensitivity = tp / (tp + fn)
+        specificity = tn / (tn + fp)
+
+        return torch.mean((sensitivity + specificity) / 2, dim=0)[0]
